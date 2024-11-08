@@ -38,8 +38,9 @@ class CryptoUtils{
     if (hashingAlgorithm.toUpperCase() == 'SHA1') {
       hash = sha1.convert(bytes);
     } else if (hashingAlgorithm.toUpperCase() == 'SHA2') {
-      // hash = sha512.convert(bytes); // SHA-2 is generally represented by SHA-256
-      return encryptedHash(dataString);
+      hash = sha512.convert(bytes); // SHA-2 is generally represented by SHA-256
+      // hash = sha256.convert(bytes); // SHA-2 is generally represented by SHA-256
+      // return encryptedHash(dataString);
     } else {
       throw Exception('Unsupported hashing algorithm: $hashingAlgorithm');
     }

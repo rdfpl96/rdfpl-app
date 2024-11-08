@@ -153,7 +153,7 @@ class PaymentOptionsViewModel with ChangeNotifier {
     String custMobNo="8169189257";
     String custEmail="patilsunil8936.sp@gmail.com";
     String merchantId="T1040192";
-    String _salt="1764062627XUSNOS";
+    String _salt="7117036559RRVMUJ";
 
     //test ids
     // merchantId="T206030";
@@ -186,16 +186,16 @@ class PaymentOptionsViewModel with ChangeNotifier {
     String hashValue = CryptoUtils.generateHash(
       merchantId: merchantId,
       txnId: txnId,
-      totalAmount: "10",
+      totalAmount: "5",
       accountNo: "",
       consumerId:custId,
       consumerMobileNo: custMobNo,
       consumerEmailId: custEmail,
-      debitStartDate: Utils.getDateInFormat("dd-MM-yyyy"),
-      debitEndDate:debitEndDate,
-      maxAmount: "10",
-      amountType: "Variable",//"Fixed",
-      frequency: "ADHO",
+      debitStartDate: "",//Utils.getDateInFormat("dd-MM-yyyy"),
+      debitEndDate:"",//debitEndDate,
+      maxAmount: "",
+      amountType: "",//"Variable",
+      frequency: "",
       cardNumber: "",//"""4111111111111111",
       expMonth: "",//"""12",
       expYear: "",//"2025",
@@ -210,7 +210,7 @@ class PaymentOptionsViewModel with ChangeNotifier {
      deviceID = ""; // initialize variable
 
     if (Platform.isAndroid) {
-      deviceID = "AndroidSH2"; // Android-specific deviceId, supported options are "AndroidSH1" & "AndroidSH2"
+      deviceID = "ANDROIDSH2"; // Android-specific deviceId, supported options are "AndroidSH1" & "AndroidSH2"
     } else if (Platform.isIOS) {
       deviceID = "iOSSH2"; // iOS-specific deviceId, supported options are "iOSSH1" & "iOSSH2"
     }
@@ -260,7 +260,7 @@ class PaymentOptionsViewModel with ChangeNotifier {
         "enableMerTxnDetails": true,
       },
       "consumerData": {
-        "deviceId": "ANDROIDSH2",   //supported values "ANDROIDSH1" or "ANDROIDSH2" for Android and supported values "iOSSH1" or "iOSSH2" for iOS
+        "deviceId": deviceID,   //supported values "ANDROIDSH1" or "ANDROIDSH2" for Android and supported values "iOSSH1" or "iOSSH2" for iOS
         "token": token,//"e04be9ed85f134a8ca30f609dca6c1f36e742762590daf6ed6edda06275f378a2147f6244ca2295d134beba1e98c6e67140577893b99e6bd34c09d3f2350519c",
         "paymentMode": "all",
         "merchantLogoUrl": "https://www.paynimo.com/CompanyDocs/company-logo-vertical.png", //provided merchant logo will be displayed
@@ -271,7 +271,7 @@ class PaymentOptionsViewModel with ChangeNotifier {
         "consumerEmailId": custEmail,
         "txnId": txnId, //Unique merchant transaction ID
         "items": [
-          {"itemId": "first", "amount": "10", "comAmt": "0"}
+          {"itemId": "first", "amount": "5", "comAmt": "0"}
         ],
         "customStyle": {
           "PRIMARY_COLOR_CODE": "#45beaa", //merchant primary color code
