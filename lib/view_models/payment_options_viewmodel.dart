@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:royal_dry_fruit/res/app_urls.dart';
+import 'package:royal_dry_fruit/utils/CryptoUtils.dart';
 import 'package:royal_dry_fruit/utils/routes/routes_name.dart';
 import 'package:weipl_checkout_flutter/weipl_checkout_flutter.dart';
 
@@ -145,19 +148,23 @@ class PaymentOptionsViewModel with ChangeNotifier {
 
   void makePayment() {
     String deviceID = ""; // initialize variable
-    String txnId="1684835158539";
-    String custId="c964635";
+    String txnId=ORDER_ID;
+    String custId="Cust_1234";
     String custMobNo="8169189257";
     String custEmail="patilsunil8936.sp@gmail.com";
     String merchantId="T1040192";
-    String _salt="1764062627XUSNOS";
+    String _salt="7117036559RRVMUJ";
 
-    merchantId="L3348";
+    //test ids
+    // merchantId="T206030";
+    // custId="c964634";
     // custMobNo="9876543210";
     // custEmail="test@test.com";
-    String token="a7356fb644fa98999a45d62361c80a574ff24f96b59669381593edbb97ef4feb0ea427d19e79b8d4ef5d82d38bb0eae890615b5054c702695deef11ec771b751";
+    // txnId="1684835158539";
+    // _salt="3976262521OAOQBJ";
+    String token="";
 
-
+    String hashingAlgorithm = 'SHA2';
     if (Platform.isAndroid) {
       List<int> decodedBytes = base64Decode(_sha1);
       String decodedString = String.fromCharCodes(decodedBytes);
@@ -166,41 +173,50 @@ class PaymentOptionsViewModel with ChangeNotifier {
       deviceID =
           "iOSSH2"; // iOS-specific deviceId, supported options are "iOSSH1" & "iOSSH2"
     }
+    DateTime startDate = DateTime.now(); // Current date
 
+    // Format the start date in ISO 8601 format
+    var debitStartDate = startDate.toIso8601String();
 
-    final hashValue = generateHash(
+    // Add 30 years to the start date
+    DateTime endDate = DateTime(startDate.year + 30, startDate.month, startDate.day);
+
+    // Format the end date in ISO 8601 format
+    String debitEndDate=new DateFormat("dd-MM-yyyy").format(endDate);
+    String hashValue = CryptoUtils.generateHash(
       merchantId: merchantId,
       txnId: txnId,
-        totalAmount: "10",
+      totalAmount: "5",
       accountNo: "",
-      consumerId: custId,
+      consumerId:custId,
       consumerMobileNo: custMobNo,
       consumerEmailId: custEmail,
-      debitStartDate: "28-09-2024",
-      debitEndDate: "",
-      maxAmount: "10",
-      amountType: "",
+      debitStartDate: "",//Utils.getDateInFormat("dd-MM-yyyy"),
+      debitEndDate:"",//debitEndDate,
+      maxAmount: "",
+      amountType: "",//"Variable",
       frequency: "",
-      cardNumber: "",
-      expMonth: "",
-      expYear: "",
-      cvvCode: "",
+      cardNumber: "",//"""4111111111111111",
+      expMonth: "",//"""12",
+      expYear: "",//"2025",
+      cvvCode: "",//"123",
       salt: _salt,
-      algorithm: "SHA-1", // or "SHA-1"
+      hashingAlgorithm: hashingAlgorithm,
     );
-    print("DeviceID:$hashValue");
 
+    print('Generated Hash Value: $hashValue');
+    token=hashValue;
 
      deviceID = ""; // initialize variable
 
     if (Platform.isAndroid) {
-      deviceID = "AndroidSH2"; // Android-specific deviceId, supported options are "AndroidSH1" & "AndroidSH2"
+      deviceID = "ANDROIDSH2"; // Android-specific deviceId, supported options are "AndroidSH1" & "AndroidSH2"
     } else if (Platform.isIOS) {
       deviceID = "iOSSH2"; // iOS-specific deviceId, supported options are "iOSSH1" & "iOSSH2"
     }
 
 
-    // token=hashValue;
+   // token="a7356fb644fa98999a45d62361c80a574ff24f96b59669381593edbb97ef4feb0ea427d19e79b8d4ef5d82d38bb0eae890615b5054c702695deef11ec771b751";
      var reqJson = {
       "features": {
         "enableAbortResponse": true,
@@ -221,7 +237,7 @@ class PaymentOptionsViewModel with ChangeNotifier {
         "consumerEmailId": custEmail,
         "txnId":txnId, //Unique merchant transaction ID
         "items": [
-          {"itemId": "first", "amount": "10", "comAmt": "0"}
+          {"itemId": "first", "amount": "2", "comAmt": "0"}
         ],
         "customStyle": {
           "PRIMARY_COLOR_CODE":
@@ -235,6 +251,37 @@ class PaymentOptionsViewModel with ChangeNotifier {
         }
       }
     };
+
+    var options = {
+      "features": {
+        "enableAbortResponse": true,
+        "enableExpressPay": true,
+        "enableInstrumentDeRegistration": true,
+        "enableMerTxnDetails": true,
+      },
+      "consumerData": {
+        "deviceId": deviceID,   //supported values "ANDROIDSH1" or "ANDROIDSH2" for Android and supported values "iOSSH1" or "iOSSH2" for iOS
+        "token": token,//"e04be9ed85f134a8ca30f609dca6c1f36e742762590daf6ed6edda06275f378a2147f6244ca2295d134beba1e98c6e67140577893b99e6bd34c09d3f2350519c",
+        "paymentMode": "all",
+        "merchantLogoUrl": "https://www.paynimo.com/CompanyDocs/company-logo-vertical.png", //provided merchant logo will be displayed
+        "merchantId": merchantId,//"L3348",
+        "currency": "INR",
+        "consumerId": custId,//"c964634",
+        "consumerMobileNo": custMobNo,
+        "consumerEmailId": custEmail,
+        "txnId": txnId, //Unique merchant transaction ID
+        "items": [
+          {"itemId": "first", "amount": "5", "comAmt": "0"}
+        ],
+        "customStyle": {
+          "PRIMARY_COLOR_CODE": "#45beaa", //merchant primary color code
+          "SECONDARY_COLOR_CODE": "#FFFFFF", //provide merchant's suitable color code
+          "BUTTON_COLOR_CODE_1": "#2d8c8c", //merchant's button background color code
+          "BUTTON_COLOR_CODE_2": "#FFFFFF" //provide merchant's suitable color code for button text
+        }
+      }
+    };
+    reqJson=options;
     print("RAW PG:$reqJson");
     wlCheckoutFlutter.on(WeiplCheckoutFlutter.wlResponse, handleResponse);
     wlCheckoutFlutter.open(reqJson);
@@ -296,59 +343,5 @@ class PaymentOptionsViewModel with ChangeNotifier {
     );
   }
 
-  String generateHash({
-    required String merchantId,
-    required String txnId,
-    required String totalAmount,
-    required String accountNo,
-    required String consumerId,
-    required String consumerMobileNo,
-    required String consumerEmailId,
-    required String debitStartDate,
-    required String debitEndDate,
-    required String maxAmount,
-    required String amountType,
-    required String frequency,
-    required String cardNumber,
-    required String expMonth,
-    required String expYear,
-    required String cvvCode,
-    required String salt,
-    required String algorithm,
-  }) {
-    // Concatenate values with pipe separator
-    final input = [
-      merchantId,
-      txnId,
-      totalAmount,
-      accountNo,
-      consumerId,
-      consumerMobileNo,
-      consumerEmailId,
-      debitStartDate,
-      debitEndDate,
-      maxAmount,
-      amountType,
-      frequency,
-      cardNumber,
-      expMonth,
-      expYear,
-      cvvCode,
-      salt
-    ].join('|');
 
-    // Hash the input string
-    late Digest hash;
-
-    if (algorithm.toUpperCase() == 'SHA-1') {
-      hash = sha1.convert(utf8.encode(input));
-    } else if (algorithm.toUpperCase() == 'SHA-256') {
-      hash = sha256.convert(utf8.encode(input));
-    } else {
-      throw Exception('Unsupported algorithm: $algorithm');
-    }
-
-    // Return the hash as a hexadecimal string
-    return hash.toString();
-  }
 }

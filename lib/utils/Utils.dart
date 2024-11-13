@@ -45,9 +45,30 @@ class Utils{
       return 'Error: ${e.toString()}';
     }
   }
+  static getDateInFormat( String fr_format) {
+    try {
+      // Parse the date string using the fromFormat
+      final DateTime dt=DateTime.now();
+
+      // Format the date using the toFormat
+      final DateFormat outputFormat = DateFormat(fr_format);
+
+      final String formattedDate = outputFormat.format(dt);
+
+      return formattedDate;
+    } catch (e) {
+      // Handle any parsing or formatting errors
+      return 'Error: ${e.toString()}';
+    }
+  }
+
 
   static int getDateInNumber() {
     DateTime dt=DateTime.now();
     return dt.millisecond;
+  }
+  static String getDateInISO(){
+    DateTime dt=DateTime.now();
+    return dt.toIso8601String();
   }
 }
